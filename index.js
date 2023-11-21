@@ -1,65 +1,63 @@
+let formUser = document.getElementById("user-form");
 
-
-
-
-let userForm = document.getElementById("user-form");
-const retrieveEntries = () => {
+const retreiveval = () => {
   let entries = localStorage.getItem("user-entries");
   if (entries) {
-    entries = JSON.parse(entries);
+    return JSON.parse(entries);
   } else {
-    entries = [];
+    return [];
   }
-  return entries;
 };
+
+let userEntries = retreiveval();
+
+const displayEntries = () => {
+  const entries = retreiveval();
+  
+  const tableEntries = entries.map((entry) => {
+    const nameCell = `<td class='border px-4 py-2'>${entry.name}</td>`;
+    const emailCell = `<td class='border px-4 py-2'>${entry.email}</td>`;
+    const passwordCell = `<td class='border px-4 py-2'>${entry.password}</td>`;
+    const dobCell = `<td class='border px-4 py-2'>${entry.dob}</td>`;
+    const acceptTermsCell = `<td class='border px-4 py-2'>${entry.acceptedTermsAndconditions}</td>`;
+    const row = `<tr>${nameCell}${emailCell}${passwordCell}${dobCell}${acceptTermsCell}</tr>`;
+    return row;
+  }).join("\n");
+
+  const table = `<table class="table-auto w-full">
+                  <tr>
+                    <th class="px-4 py-2">Name</th>
+                    <th class="px-4 py-2">Email</th>
+                    <th class="px-4 py-2">Password</th>
+                    <th class="px-4 py-2">DOB</th>
+                    <th class="px-4 py-2">Accepted Terms?</th>
+                  </tr>
+                  ${tableEntries}
+                </table>`;
+
+  let details = document.getElementById("user-entries");
+  details.innerHTML = table;
+};
+
 const calculateAge = (dob) => {
-  const today = new Date();
-  const birthDate = new Date(dob);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+  const currentDate = new Date();
+  const givenDate = new Date(dob);
+  let age = currentDate.getFullYear() - givenDate.getFullYear();
+  const month = currentDate.getMonth() - givenDate.getMonth();
+  if (month < 0 || (month === 0 && currentDate.getDate() < givenDate.getDate())) {
     age--;
   }
   return age;
 };
 
-let userEntries = retrieveEntries();
-
-const displayEntries = () => {
-  const entries = retrieveEntries();
-
-  const tableEntries = entries
-    .map((entry) => {
-      const namecell = `<td>${entry.name}</td>`;
-      const emailcell = `<td>${entry.email}</td>`;
-      const passwordcell = `<td>${entry.password}</td>`;
-      const dobcell = `<td>${entry.dob}</td>`;
-      const acceptTermscell = `<td>${entry.acceptTerms}</td>`;
-      const row = `<tr>${namecell} ${emailcell} ${passwordcell} ${dobcell} ${acceptTermscell}</tr>`;
-      return row;
-    })
-    .join("\n");
-  const table = `<table>
-  <thead>
-<tr>
-<th>Name</th>
-<th>Email</th>
-<th>Password</th>
-<th>Dob</th>
-<th>Accepted terms</th>
-</tr>
-</thead>${tableEntries}</table>`;
-
-  let details = document.getElementById("user-entries");
-  details.innerHTML = table;
-};
-const saveuserForm = (event) => {
+const saveUserForm = (event) => {
   event.preventDefault();
   const name = document.getElementById("name").value;
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const dob = document.getElementById("dob").value;
-  const tickBox = document.getElementById("acceptTerms");
+  const acceptedTermsAndconditions = document.getElementById("acceptTerms").checked;
+  
   const age = calculateAge(dob);
   if (age < 18 || age > 55) {
     alert("Age must be between 18 and 55.");
@@ -71,13 +69,13 @@ const saveuserForm = (event) => {
     email,
     password,
     dob,
-    acceptTerms:tickBox.checked,
+    acceptedTermsAndconditions,
   };
   userEntries.push(entry);
-
+  
   localStorage.setItem("user-entries", JSON.stringify(userEntries));
   displayEntries();
 };
 
-userForm.addEventListener("submit", saveuserForm);
+formUser.addEventListener("submit", saveUserForm);
 displayEntries();
